@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Para ti ❤️</title>
+
+    <!-- Bootstrap (última estable 5.3.x) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Tailwind (última 3.x por CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --paper: #fff8fb;
+            --paper2: #ffe7f2;
+            --envelope: #ff6aa2;
+            --envelopeDark: #e84f8c;
+            --shadow: 0 24px 70px rgba(0, 0, 0, .25);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background:
+                radial-gradient(1200px 800px at 20% 10%, rgba(255, 115, 170, .35), transparent 60%),
+                radial-gradient(900px 700px at 85% 30%, rgba(255, 215, 232, .55), transparent 55%),
+                radial-gradient(800px 700px at 45% 95%, rgba(255, 102, 162, .25), transparent 60%),
+                linear-gradient(135deg, #0b0b12, #1b1230);
+        }
+
+        /* Glow */
+        .soft-glow {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 35px 80px rgba(255, 70, 150, .18);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Envelope scene */
+        .scene {
+            position: relative;
+            width: min(520px, 92vw);
+            height: 420px;
+            display: grid;
+            place-items: center;
+            perspective: 1200px;
+        }
+
+        .envelope-wrap {
+            position: relative;
+            width: min(480px, 88vw);
+            height: 340px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            user-select: none;
+            perspective: 1200px;
+        }
+
+        .envelope {
+            position: absolute;
+            inset: 0;
+            border-radius: 26px;
+            background: linear-gradient(135deg, var(--envelope), var(--envelopeDark));
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            filter: saturate(1.05);
+        }
+
+        /* Paper (letter) */
+        .paper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(430px, 86vw);
+            max-height: min(82vh, 680px);
+            border-radius: 22px;
+            background: linear-gradient(180deg, var(--paper), var(--paper2));
+            box-shadow: 0 22px 50px rgba(0, 0, 0, .25);
+            padding: 20px;
+            z-index: 10;
+            transform-origin: bottom center;
+            opacity: 0;
+            box-shadow: 0 26px 60px rgba(0, 0, 0, .30);
+        }
+
+
+        .paper .inner {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .75);
+            border: 1px dashed rgba(255, 80, 160, .35);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flap-top {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 60%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, .22), rgba(0, 0, 0, .10));
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top center;
+            transform: rotateX(0deg);
+            z-index: 20;
+            transition: transform 900ms cubic-bezier(.16, .9, .25, 1);
+            backface-visibility: hidden;
+        }
+
+
+        .flap-left,
+        .flap-right {
+            position: absolute;
+            top: 20%;
+            width: 52%;
+            height: 80%;
+            background: rgba(0, 0, 0, .08);
+            z-index: 3;
+        }
+
+        .flap-left {
+            left: -2px;
+            clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 80%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, .14), rgba(0, 0, 0, .10));
+        }
+
+        .flap-right {
+            right: -2px;
+            clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, .10), rgba(255, 255, 255, .12));
+        }
+
+        .flap-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 52%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, .08), rgba(255, 255, 255, .12));
+            clip-path: polygon(0 100%, 100% 100%, 50% 0);
+            z-index: 5;
+            opacity: .92;
+        }
+
+        /* Seal */
+        .seal {
+            position: absolute;
+            left: 50%;
+            top: 58%;
+            transform: translate(-50%, -50%);
+            width: 78px;
+            height: 78px;
+            border-radius: 999px;
+            z-index: 6;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(circle at 35% 30%, #ffd1e5, #ff3f8e 60%, #b5004c);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, .28);
+            border: 1px solid rgba(255, 255, 255, .22);
+        }
+
+        .closing .flap-top {
+            transform: rotateX(180deg);
+        }
+
+        .seal span {
+            font-size: 28px;
+            filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .25));
+        }
+
+        /* OPEN state */
+        .open .flap-top {
+            transform: rotateX(180deg);
+        }
+
+        .open .paper {
+            animation: paperOut 1100ms cubic-bezier(.16, .95, .25, 1) forwards;
+        }
+
+        .open .seal {
+            animation: sealPop 800ms cubic-bezier(.2, .9, .2, 1) forwards;
+        }
+
+        @keyframes paperOut {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -20%) scale(.9);
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -66%) scale(1);
+            }
+        }
+
+
+        @keyframes sealPop {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+
+            45% {
+                transform: translate(-50%, -55%) scale(1.08);
+            }
+
+            100% {
+                transform: translate(-50%, -30%) scale(.0);
+                opacity: 0;
+            }
+        }
+
+        /* Floating hearts */
+        #hearts-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 60;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 22px;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, .25));
+            animation: floatUp var(--dur) linear forwards;
+            opacity: 0.95;
+        }
+
+        .floating-img {
+            position: absolute;
+            width: 48px;
+            /* tamaño base */
+            pointer-events: none;
+            opacity: 0;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .35));
+            animation: floatImg var(--dur) linear forwards;
+        }
+
+        @keyframes floatImg {
+            0% {
+                transform: translate(var(--x), 110vh) scale(.9) rotate(var(--rot));
+                opacity: 0;
+            }
+
+            12% {
+                opacity: 1;
+                /* aparece */
+            }
+
+            32% {
+                opacity: .50;
+                /* ✅ se vuelve transparente antes */
+            }
+
+            50% {
+                opacity: 0;
+                /* ✅ se apaga más rápido */
+            }
+
+            100% {
+                transform: translate(calc(var(--x) + var(--drift)), -20vh) scale(1.05) rotate(calc(var(--rot) + 180deg));
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translate(var(--x), 110vh) rotate(var(--rot));
+                opacity: 0;
+            }
+
+            8% {
+                opacity: .95;
+            }
+
+            60% {
+                opacity: .9;
+            }
+
+            82% {
+                opacity: .25;
+                /* ✅ ya casi arriba */
+            }
+
+            92% {
+                opacity: 0;
+                /* ✅ desaparece casi arriba */
+            }
+
+            100% {
+                transform: translate(calc(var(--x) + var(--drift)), -20vh) rotate(calc(var(--rot) + 240deg));
+                opacity: 0;
+            }
+        }
+
+
+        /* Animación al cerrar (paper entra de regreso) */
+        .closing .paper {
+            animation: paperIn 750ms cubic-bezier(.2, .9, .2, 1) forwards;
+        }
+
+        @keyframes paperIn {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -54%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -20%) scale(.9);
+            }
+        }
+
+
+        /* Small hint pulse */
+        .hint {
+            animation: hintPulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes hintPulse {
+
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: .9;
+            }
+
+            50% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* Prevent selecting accidental */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Estado cerrado: sin papel visible y flap arriba cerrado */
+        .envelope-wrap:not(.open) .paper {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -20%) scale(.9);
+        }
+
+        .envelope-wrap:not(.open) .flap-top {
+            transform: rotateX(0deg);
+        }
+
+        /* ✅ Evita que la carta se salga por abajo: recorte inferior */
+        .paper {
+            overflow: hidden;
+            /* recorta contenido que sobresalga */
+            padding-bottom: 28px;
+            /* aire para que no corte texto */
+        }
+
+        /* Esto “corta” el borde inferior de la carta para que no se vea fuera del sobre */
+        .paper::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -1px;
+            height: 28px;
+            /* ajusta si quieres más/menos corte */
+            background: linear-gradient(to top,
+                    rgba(0, 0, 0, 0.18),
+                    rgba(0, 0, 0, 0.0));
+            opacity: 0;
+            /* por defecto invisible */
+            pointer-events: none;
+        }
+
+        /* Cuando está abierta, aplicamos un “corte” visual abajo igual que arriba */
+        .open .paper {
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
+        }
+
+        /* Opcional: si quieres que la parte inferior se “meta” visualmente */
+        .open .paper::after {
+            opacity: .18;
+        }
+
+        .fixed-photos {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            /* detrás de la carta (paper z-index 10) */
+
+            /* ✅ ocultas por defecto */
+            opacity: 0;
+            transform: scale(.98);
+            transition: opacity 550ms ease, transform 550ms ease;
+        }
+
+        /* ✅ cuando se abre el sobre, se muestran */
+        body.photos-on .fixed-photos {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 🫧 movimiento sutil (flotación) sin cambiar posición */
+        .fixed-photos img {
+            position: absolute;
+            width: 300px;
+            opacity: 1;
+            filter: drop-shadow(0 16px 26px rgba(0, 0, 0, .45));
+
+            animation: photoFloat 4.2s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .fixed-photos img:nth-child(1) {
+            animation-duration: 3.0s;
+            animation-delay: .0s;
+        }
+
+        .fixed-photos img:nth-child(2) {
+            animation-duration: 2.5s;
+            animation-delay: .4s;
+        }
+
+        .fixed-photos img:nth-child(3) {
+            animation-duration: 3.0s;
+            animation-delay: .8s;
+        }
+
+        .fixed-photos img:nth-child(4) {
+            animation-duration: 2.5s;
+            animation-delay: .2s;
+        }
+
+
+        @keyframes photoFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(var(--rot, 0deg));
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(var(--rot, 0deg));
+            }
+        }
+
+
+        /* 🎆 Capa de fuegos artificiales */
+        #fireworks-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 80;
+            /* encima de todo */
+        }
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .35));
+        }
+
+        .firework::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, .65) 28%, rgba(255, 255, 255, 0) 60%);
+            transform: scale(.35);
+            opacity: .95;
+            animation: fwCore 900ms ease-out forwards;
+        }
+
+        .firework::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 12px;
+            height: 12px;
+            transform: translate(-50%, -50%);
+            border-radius: 999px;
+            /* 12 rayos alrededor */
+            box-shadow:
+                0 -70px 0 0 rgba(255, 240, 170, .95),
+                35px -60px 0 0 rgba(255, 140, 200, .95),
+                60px -35px 0 0 rgba(170, 255, 240, .95),
+                70px 0 0 0 rgba(255, 240, 170, .95),
+                60px 35px 0 0 rgba(180, 190, 255, .95),
+                35px 60px 0 0 rgba(255, 170, 120, .95),
+                0 70px 0 0 rgba(255, 240, 170, .95),
+                -35px 60px 0 0 rgba(255, 140, 200, .95),
+                -60px 35px 0 0 rgba(170, 255, 240, .95),
+                -70px 0 0 0 rgba(255, 240, 170, .95),
+                -60px -35px 0 0 rgba(180, 190, 255, .95),
+                -35px -60px 0 0 rgba(255, 170, 120, .95);
+            opacity: .95;
+            animation: fwBurst 900ms cubic-bezier(.2, .9, .2, 1) forwards;
+        }
+
+        @keyframes fwCore {
+            0% {
+                transform: scale(.2);
+                opacity: 0;
+            }
+
+            10% {
+                transform: scale(.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fwBurst {
+            0% {
+                transform: translate(-50%, -50%) scale(.12);
+                opacity: 0;
+            }
+
+            12% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.25);
+                opacity: 0;
+            }
+        }
+
+
+        /* ✅ Título arcoíris */
+        .arc-title {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            right: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            z-index: 90;
+            /* encima de todo */
+        }
+
+        .arc-svg {
+            width: min(980px, 96vw);
+            height: auto;
+        }
+
+        .arc-text {
+            font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Arial;
+            font-weight: 900;
+            font-size: 86px;
+            letter-spacing: 2px;
+            fill: url(#rainbow);
+            stroke: rgba(255, 255, 255, .22);
+            stroke-width: 3px;
+        }
+
+        @media (max-width: 600px) {
+            .arc-text {
+                font-size: 64px;
+            }
+        }
+
+        /* ✅ Modal bloqueo */
+        .lock-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(10px);
+            display: grid;
+            place-items: center;
+            z-index: 120;
+            padding: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .lock-card {
+            width: min(520px, 96vw);
+            border-radius: 24px;
+            padding: 18px 18px 16px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .14);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .35);
+            text-align: center;
+        }
+
+        .lock-emoji {
+            font-size: 42px;
+            margin-bottom: 6px;
+        }
+
+        .lock-title {
+            font-size: 22px;
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .lock-text {
+            margin: 10px 0 6px;
+            opacity: .95;
+        }
+
+        .lock-count {
+            margin: 0 0 14px;
+            font-size: 14px;
+            opacity: .85;
+        }
+
+        .lock-btn {
+            width: 100%;
+            border: 0;
+            border-radius: 16px;
+            padding: 12px 14px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6aa2, #e84f8c);
+            color: white;
+            cursor: pointer;
+            transition: transform .12s ease;
+        }
+
+        .lock-btn:active {
+            transform: scale(.98);
+        }
+        /* 🔧 FIX viewport móvil (Safari / Chrome) */
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100dvh; /* usa viewport dinámico real */
+}
+@media (max-width: 768px) {
+    .scene {
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .envelope-wrap {
+        margin: 0 auto;
+        transform: translateX(0); /* fuerza centrado real */
+    }
+}
+@supports (-webkit-touch-callout: none) {
+    body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
+
+
+    </style>
+    
+</head>
+
+<audio id="bgMusic" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio.
+</audio>
+
+<body class="text-white">
+    <div id="hearts-layer"></div>
+    <div id="fireworks-layer"></div>
+    <!-- ✅ Título en arcoíris -->
+    <div class="arc-title" aria-hidden="true">
+        <svg viewBox="0 0 1200 260" class="arc-svg">
+            <defs>
+                <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00d4ff" />
+                    <stop offset="25%" stop-color="#7c4dff" />
+                    <stop offset="50%" stop-color="#ff4fd8" />
+                    <stop offset="75%" stop-color="#ff6aa2" />
+                    <stop offset="100%" stop-color="#ffd36a" />
+                </linearGradient>
+
+                <path id="arcPath" d="M120,210 Q600,30 1080,210" />
+                <filter id="softGlowText" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <text class="arc-text" filter="url(#softGlowText)">
+                <textPath href="#arcPath" startOffset="50%" text-anchor="middle">
+                    FELIZ CUMPLEAÑOS
+                </textPath>
+            </text>
+        </svg>
+    </div>
+
+
+    <div class="fixed-photos">
+        <img src="imagen1.png" style="left: 6%; top: 12%; --rot:-8deg;" />
+        <img src="imagen5.png" style="right: 7%; top: 10%; --rot:10deg;" />
+        <img src="imagen3.png" style="left: 8%; bottom: 10%; --rot:6deg;" />
+        <img src="imagen4.png" style="right: 9%; bottom: 12%; --rot:-6deg;" />
+
+
+    </div>
+    <!-- ✅ Modal bloqueo por fecha -->
+    <div id="lockModal" class="lock-modal hidden">
+        <div class="lock-card">
+            <div class="lock-emoji">⏳💌</div>
+            <h3 class="lock-title">Aún no es la fecha</h3>
+            <p class="lock-text" id="lockText">
+                Esta carta se abre el 12 de febrero.
+            </p>
+            <p class="lock-count" id="lockCountdown"></p>
+            <button id="lockOk" class="lock-btn">Entendido</button>
+        </div>
+    </div>
+
+    <main class="min-h-screen flex items-center justify-center px-3 py-4">
+        <div class="soft-glow rounded-3xl p-4 md:p-5 w-full max-w-3xl">
+
+
+            <div class="scene mx-auto">
+                <div id="envelopeWrap" class="envelope-wrap" role="button" aria-label="Abrir carta" tabindex="0">
+                    <div class="envelope">
+                        <div class="flap-top"></div>
+                        <div class="flap-left"></div>
+                        <div class="flap-right"></div>
+                        <div class="flap-bottom"></div>
+                    </div>
+
+                    <div class="paper">
+                        <div class="inner text-slate-900">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <div class="text-sm font-semibold text-rose-600">Para: <span id="toName">Mi niña
+                                        hermosa</span></div>
+                                <button id="toggleHeart" type="button" class="text-rose-600 text-lg md:text-xl font-semibold rounded-full px-2 py-1
+         hover:bg-rose-100 active:scale-95 transition" title="Cerrar / Abrir">
+                                    💝
+                                </button>
+
+                            </div>
+
+                            <h2 class="text-xl md:text-2xl font-extrabold text-slate-800 leading-tight">
+                                Feliz Cumpleaños 🎂🥳
+                            </h2>
+
+                            <p class="mt-3 text-base md:text-lg leading-relaxed text-slate-700">
+                                <span id="message">
+                                    Hoy es una fecha doblemente especial, y yo solo quería recordarte lo increíble que
+                                    eres.
+                                    Gracias por existir, por tu forma de ser y por hacer que todo se sienta más bonito.
+                                    <br><br>
+                                    Ojalá este detalle te saque una sonrisa (de esas que iluminan todo). 💗
+                                </span>
+                            </p>
+
+                            <div class="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200">
+                                <div class="text-sm font-semibold text-rose-700">PD:</div>
+                                <div class="text-sm text-rose-700">
+                                    Este sobre se abre una sola vez… pero lo que siento por ti se repite todos los días.
+                                    ✨
+                                </div>
+                            </div>
+
+                            <div class="mt-auto pt-4 text-xs text-slate-500 flex items-center justify-between">
+                                <span>Con cariño,</span>
+                                <span class="font-semibold text-slate-700" id="fromName">Gabito</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="seal"><span>❤️</span></div>
+                </div>
+            </div>
+
+
+        </div>
+    </main>
+
+    <script>
+
+        const LOCK_MONTH = 1; // Febrero
+        const LOCK_DAY = 2;   // Hoy (4)
+
+        const lockModal = document.getElementById("lockModal");
+        const lockText = document.getElementById("lockText");
+        const lockCountdown = document.getElementById("lockCountdown");
+        const lockOk = document.getElementById("lockOk");
+
+        function getTargetDate() {
+            const now = new Date();
+            const y = now.getFullYear();
+            // Se desbloquea desde 12 Feb 00:00:00 (hora local del dispositivo)
+            return new Date(y, LOCK_MONTH, LOCK_DAY, 0, 0, 0, 0);
+        }
+
+        function canOpenLetter() {
+            const now = new Date();
+            const target = getTargetDate();
+            return now >= target;
+        }
+
+        function formatTarget() {
+            const target = getTargetDate();
+            const opts = { day: "2-digit", month: "long" };
+            return target.toLocaleDateString("es-ES", opts);
+        }
+
+        function getCountdownText() {
+            const now = new Date();
+            const target = getTargetDate();
+            const diff = target - now;
+
+            if (diff <= 0) return "✅ Ya puedes abrirla.";
+
+            const totalSeconds = Math.floor(diff / 1000);
+
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const mins = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
+
+            // ✅ FORMATO BONITO
+            if (days > 0) {
+                if (hours > 0) {
+                    return `Faltan ${days} día(s), ${hours}h ${mins}m ${secs}s.`;
+                }
+                return `Faltan ${days} día(s), ${mins}m ${secs}s.`;
+            }
+
+            if (hours > 0) return `Faltan ${hours}h ${mins}m ${secs}s.`;
+            if (mins > 0) return `Faltan ${mins}m ${secs}s.`;
+            return `Faltan ${secs}s.`;
+        }
+
+
+
+        let lockTimer = null;
+
+        function showLockModal() {
+            lockText.textContent = `Esta carta se abre el ${formatTarget()}.`;
+
+            // ✅ pinta de una
+            lockCountdown.textContent = getCountdownText();
+
+            lockModal.classList.remove("hidden");
+
+            // ✅ contador en tiempo real
+            if (lockTimer) clearInterval(lockTimer);
+            lockTimer = setInterval(() => {
+                lockCountdown.textContent = getCountdownText();
+
+                // ✅ si ya llegó la fecha, cierra solo el modal
+                if (canOpenLetter()) {
+                    hideLockModal();
+                }
+            }, 1000);
+        }
+
+        function hideLockModal() {
+            lockModal.classList.add("hidden");
+
+            if (lockTimer) {
+                clearInterval(lockTimer);
+                lockTimer = null;
+            }
+        }
+
+
+        lockOk.addEventListener("click", hideLockModal);
+
+        lockModal.addEventListener("click", (e) => {
+            if (e.target === lockModal) hideLockModal();
+        });
+
+        // ✅ AQUÍ VA
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden && !lockModal.classList.contains("hidden")) {
+                lockCountdown.textContent = getCountdownText();
+            }
+        });
+
+
+        const envelopeWrap = document.getElementById("envelopeWrap");
+        const heartsLayer = document.getElementById("hearts-layer");
+        const toggleHeart = document.getElementById("toggleHeart");
+
+        let opened = false;
+        let burstInterval = null;
+
+        const heartEmojis = ["❤️", "💗", "💖", "💘", "💕", "💞", "💓", "💝", "🩷", "🥰", "😘", "🤭", "😊", "☺️", "😍"];
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+
+        const fireworksLayer = document.getElementById("fireworks-layer");
+        let fireworksInterval = null;
+
+        function spawnFireworkBurst() {
+            const fw = document.createElement("div");
+            fw.className = "firework";
+
+            // posición aleatoria pero bonita (no tan abajo)
+            const x = rand(10, 90);
+            const y = rand(12, 55);
+
+            fw.style.left = x + "vw";
+            fw.style.top = y + "vh";
+
+            fireworksLayer.appendChild(fw);
+
+            // se elimina solo
+            setTimeout(() => fw.remove(), 1000);
+        }
+
+        function startFireworks() {
+            if (fireworksInterval) return;
+            // uno inmediato para que se note al abrir
+            spawnFireworkBurst();
+
+            fireworksInterval = setInterval(() => {
+                spawnFireworkBurst();
+                if (Math.random() > 0.45) setTimeout(spawnFireworkBurst, 180);
+            }, 2000);
+
+        }
+
+        function stopFireworks() {
+            if (!fireworksInterval) return;
+            clearInterval(fireworksInterval);
+            fireworksInterval = null;
+            fireworksLayer.innerHTML = "";
+        }
+
+
+        function spawnHeartBurst(count = 80) {
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement("div");
+                el.className = "heart";
+                el.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+                const startX = rand(0, 100);
+                const drift = rand(-20, 20);
+                const rot = rand(-90, 90);
+                const dur = rand(2.2, 5.2);
+                const size = rand(18, 34);
+
+                el.style.left = startX + "vw";
+                el.style.setProperty("--x", "0vw");
+                el.style.setProperty("--drift", drift + "vw");
+                el.style.setProperty("--rot", rot + "deg");
+                el.style.setProperty("--dur", dur + "s");
+                el.style.fontSize = size + "px";
+
+                heartsLayer.appendChild(el);
+                setTimeout(() => el.remove(), dur * 1000 + 200);
+            }
+        }
+
+
+        const floatingImages = [
+            "imagen1.png",
+            "imagen2.png",
+            "imagen3.png",
+            "imagen4.png",
+            "imagen5.png",
+        ];
+
+        function spawnFloatingImages(count = 6) {
+            for (let i = 0; i < count; i++) {
+                const img = document.createElement("img");
+                img.className = "floating-img";
+                img.src = floatingImages[Math.floor(Math.random() * floatingImages.length)];
+
+                const startX = rand(0, 100);
+                const drift = rand(-15, 15);
+                const rot = rand(-45, 45);
+                const dur = rand(6, 10);
+                const size = rand(250, 330);
+
+
+                img.style.left = startX + "vw";
+                img.style.width = size + "px";
+                img.style.setProperty("--x", "0vw");
+                img.style.setProperty("--drift", drift + "vw");
+                img.style.setProperty("--rot", rot + "deg");
+                img.style.setProperty("--dur", dur + "s");
+
+                heartsLayer.appendChild(img);
+                setTimeout(() => img.remove(), dur * 1000 + 300);
+            }
+        }
+        function startSoftRain() {
+            if (burstInterval) return;
+
+            burstInterval = setInterval(() => {
+                spawnHeartBurst(8); // solo emojis
+            }, 1300);
+        }
+
+
+
+
+
+        const music = document.getElementById("bgMusic");
+
+        // 👇 CAMBIA ESTOS VALORES (en segundos)
+        const loopStart = 52.5; // ejemplo: 1:12
+        const loopEnd = 93.8;   // ejemplo: 1:38
+
+        music.volume = 0.5;
+
+        // Repite solo el tramo
+        music.addEventListener("timeupdate", () => {
+            if (!music.paused && music.currentTime >= loopEnd) {
+                music.currentTime = loopStart;
+                music.play().catch(() => { });
+            }
+        });
+
+        function openLetter() {
+            // ✅ Bloqueo por fecha
+            if (!canOpenLetter()) {
+                showLockModal();
+                return;
+            }
+
+            if (opened) return;
+            opened = true;
+            envelopeWrap.classList.add("open");
+            document.body.classList.add("photos-on");
+
+            music.currentTime = loopStart;
+            music.play().catch(() => { });
+
+            spawnHeartBurst(120);
+            startSoftRain();
+            startFireworks();
+        }
+
+
+
+        function closeLetter() {
+            if (!opened) return;
+            opened = false;
+            document.body.classList.remove("photos-on");
+
+            music.pause();                       // 👈 pausa música
+
+            if (burstInterval) {
+                clearInterval(burstInterval);
+                burstInterval = null;
+            }
+
+            envelopeWrap.classList.add("closing");
+            stopFireworks();
+
+            setTimeout(() => {
+                envelopeWrap.classList.remove("open");
+                envelopeWrap.classList.remove("closing");
+            }, 760);
+        }
+
+
+
+        function toggleLetter() {
+            if (opened) {
+                closeLetter();
+            } else {
+                openLetter(); // openLetter ya valida fecha
+            }
+        }
+
+
+        envelopeWrap.addEventListener("click", () => {
+            if (!opened) openLetter();
+        });
+
+        envelopeWrap.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                if (!opened) openLetter();
+            }
+        });
+
+
+        // Click en el corazón: cerrar/abrir
+        toggleHeart.addEventListener("click", (e) => {
+            e.stopPropagation(); // evita que el click “dispare” el sobre también
+            toggleLetter();
+        });
+    </script>
+
+
+    <!-- Bootstrap bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
