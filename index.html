@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Para ti ❤️</title>
+    <title>FELIZ CUMPLE ❤️</title>
 
     <!-- Bootstrap (última estable 5.3.x) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -196,9 +196,11 @@
 
             100% {
                 opacity: 1;
-                transform: translate(-50%, -66%) scale(1);
+                transform: translate(-50%, -52%) scale(1);
+                /* ✅ antes -66% */
             }
         }
+
 
 
         @keyframes sealPop {
@@ -312,7 +314,8 @@
         @keyframes paperIn {
             0% {
                 opacity: 1;
-                transform: translate(-50%, -54%) scale(1);
+                transform: translate(-50%, -52%) scale(1);
+                /* ✅ antes -54% */
             }
 
             100% {
@@ -320,6 +323,7 @@
                 transform: translate(-50%, -20%) scale(.9);
             }
         }
+
 
 
         /* Small hint pulse */
@@ -576,29 +580,32 @@
             stroke-width: 3px;
         }
 
-        @media (max-width: 600px) {
-            .arc-text {
-                font-size: 64px;
-            }
-        }
+
+
 
         /* ✅ Modal bloqueo */
-        .lock-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .55);
-            backdrop-filter: blur(10px);
-            display: grid;
-            place-items: center;
-            z-index: 120;
-            padding: 16px;
-        }
+.lock-modal{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+
+  /* ✅ centrado real */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px;
+}
+
 
         .hidden {
             display: none !important;
         }
 
         .lock-card {
+            margin: 0; 
             width: min(520px, 96vw);
             border-radius: 24px;
             padding: 18px 18px 16px;
@@ -645,38 +652,155 @@
         .lock-btn:active {
             transform: scale(.98);
         }
+
         /* 🔧 FIX viewport móvil (Safari / Chrome) */
-html, body {
-    width: 100%;
-    overflow-x: hidden;
-}
+        html,
+        body {
+            width: 100%;
+            overflow-x: hidden;
+        }
 
-body {
-    min-height: 100dvh; /* usa viewport dinámico real */
-}
-@media (max-width: 768px) {
-    .scene {
-        width: 100%;
-        height: auto;
-        display: flex;
-        justify-content: center;
-    }
+        body {
+            min-height: 100dvh;
+            /* usa viewport dinámico real */
+        }
 
-    .envelope-wrap {
-        margin: 0 auto;
-        transform: translateX(0); /* fuerza centrado real */
-    }
-}
-@supports (-webkit-touch-callout: none) {
-    body {
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
-}
+        @media (max-width: 768px) {
+            .scene {
+                width: 100%;
+                height: auto;
+                display: flex;
+                justify-content: center;
+            }
+
+            .envelope-wrap {
+                margin: 0 auto;
+                transform: translateX(0);
+                /* fuerza centrado real */
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            body {
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
 
 
+        /* =========================
+   ✅ RESPONSIVO MÓVIL
+   ========================= */
+        /* =========================
+   ✅ RESPONSIVO MÓVIL (AJUSTADO)
+   ========================= */
+        @media (max-width: 600px) {
+
+            /* más espacio arriba para el título */
+            main {
+                padding-top: 110px !important;
+                padding-bottom: 20px !important;
+            }
+
+            /* ✅ FELIZ CUMPLEAÑOS más grande SOLO en teléfono */
+            .arc-title {
+                top: 6px;
+            }
+
+            .arc-text {
+                font-size: 62px !important;
+            }
+
+            /* antes 48px */
+
+            /* escena y sobre más fluidos */
+            .scene {
+                width: 100%;
+                height: auto;
+                padding: 0 10px;
+            }
+
+            .envelope-wrap {
+                width: 100% !important;
+                max-width: 520px;
+                height: 330px;
+            }
+
+            /* ✅ cuando se abre, baja un poquito la carta para que NO choque con fotos de arriba */
+            .open .paper {
+                transform: translate(-50%, -48%) scale(1) !important;
+                /* antes -52% */
+            }
+
+            /* carta más ancha y con padding menor */
+            .paper {
+                width: min(94vw, 460px) !important;
+                padding: 16px !important;
+                max-height: 76vh !important;
+
+                /* ✅ evita “transparencias” raras: carta sólida en móvil */
+                background: #fff7fb !important;
+            }
+
+            /* ✅ el interior totalmente sólido: no se ven fotos “a través” */
+            .paper .inner {
+                background: rgba(255, 255, 255, 1) !important;
+            }
+
+            /* ✅ fotos solo al abrir (se mantiene tu lógica photos-on) */
+            .fixed-photos {
+                opacity: 0;
+            }
+
+            /* cerrado: ocultas */
+            body.photos-on .fixed-photos {
+                opacity: 1;
+            }
+
+            /* abierto: visibles */
+
+            /* ✅ fotos más pequeñas en móvil */
+            .fixed-photos img {
+                width: clamp(130px, 34vw, 200px) !important;
+                opacity: 1 !important;
+                filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .35));
+            }
+
+            /* ✅ posiciones más a las esquinas y más arriba/abajo para NO tapar texto */
+            .fixed-photos img:nth-child(1) {
+                left: -10% !important;
+                top: 6% !important;
+                bottom: auto !important;
+                right: auto !important;
+                --rot: -10deg;
+            }
+
+            .fixed-photos img:nth-child(2) {
+                right: -10% !important;
+                top: 6% !important;
+                bottom: auto !important;
+                left: auto !important;
+                --rot: 10deg;
+            }
+
+            .fixed-photos img:nth-child(3) {
+                left: -10% !important;
+                bottom: 5% !important;
+                top: auto !important;
+                right: auto !important;
+                --rot: 8deg;
+            }
+
+            .fixed-photos img:nth-child(4) {
+                right: -10% !important;
+                bottom: 5% !important;
+                top: auto !important;
+                left: auto !important;
+                --rot: -8deg;
+            }
+        }
     </style>
-    
+
 </head>
 
 <audio id="bgMusic" loop>
@@ -729,15 +853,19 @@ body {
     <!-- ✅ Modal bloqueo por fecha -->
     <div id="lockModal" class="lock-modal hidden">
         <div class="lock-card">
-            <div class="lock-emoji">⏳💌</div>
-            <h3 class="lock-title">Aún no es la fecha</h3>
+            <div class="lock-emoji">⏳</div>
+            <h3 class="lock-title">Aún no es el momento 💌</h3>
             <p class="lock-text" id="lockText">
-                Esta carta se abre el 12 de febrero.
+                Esta cartita se abre el 12 de febrero,
+                justo cuando tu día especial comience. 🎂✨
+                <br><br>
+                Falta muy poquito… 💖
             </p>
             <p class="lock-count" id="lockCountdown"></p>
             <button id="lockOk" class="lock-btn">Entendido</button>
         </div>
     </div>
+
 
     <main class="min-h-screen flex items-center justify-center px-3 py-4">
         <div class="soft-glow rounded-3xl p-4 md:p-5 w-full max-w-3xl">
@@ -765,26 +893,28 @@ body {
                             </div>
 
                             <h2 class="text-xl md:text-2xl font-extrabold text-slate-800 leading-tight">
-                                Feliz Cumpleaños 🎂🥳
+                                Para ti, en tu día especial 🎂
                             </h2>
 
                             <p class="mt-3 text-base md:text-lg leading-relaxed text-slate-700">
                                 <span id="message">
-                                    Hoy es una fecha doblemente especial, y yo solo quería recordarte lo increíble que
-                                    eres.
-                                    Gracias por existir, por tu forma de ser y por hacer que todo se sienta más bonito.
+                                    Ya comenzó tu día ✨
+                                    Y no podía dejar pasar este momento sin decirte lo mucho que significas para mí.
+                                    Feliz cumpleaños a mi niñita hermosa, a mi gatito de ojitos lindos,
+                                    a esa lobita que ilumina todo con su forma de ser. 💕
+
                                     <br><br>
-                                    Ojalá este detalle te saque una sonrisa (de esas que iluminan todo). 💗
+
+                                    Que este nuevo año te abrace bonito, te regale sonrisas sinceras
+                                    y te recuerde todos los días lo valiosa que eres.
+                                    Que Diosito te bendiga siempre, cuide cada uno de tus pasos
+                                    y llene tu vida de amor, paz y alegría.
+                                    Así que simplemente, feliz cumpleaños pa tú,
+                                    que tu día sea tan especial como tu corazón. 💖🎂
                                 </span>
                             </p>
 
-                            <div class="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200">
-                                <div class="text-sm font-semibold text-rose-700">PD:</div>
-                                <div class="text-sm text-rose-700">
-                                    Este sobre se abre una sola vez… pero lo que siento por ti se repite todos los días.
-                                    ✨
-                                </div>
-                            </div>
+
 
                             <div class="mt-auto pt-4 text-xs text-slate-500 flex items-center justify-between">
                                 <span>Con cariño,</span>
@@ -805,7 +935,7 @@ body {
     <script>
 
         const LOCK_MONTH = 1; // Febrero
-        const LOCK_DAY = 2;   // Hoy (4)
+        const LOCK_DAY = 12;   // Hoy (4)
 
         const lockModal = document.getElementById("lockModal");
         const lockText = document.getElementById("lockText");
@@ -863,24 +993,23 @@ body {
         let lockTimer = null;
 
         function showLockModal() {
-            lockText.textContent = `Esta carta se abre el ${formatTarget()}.`;
+            lockText.innerHTML = `
+    Esta cartita se abre el <b>${formatTarget()}</b>,
+    justo cuando tu día especial comience. 🎂✨
+    <br><br>
+    Queda muy poquito… 💖
+  `;
 
-            // ✅ pinta de una
             lockCountdown.textContent = getCountdownText();
-
             lockModal.classList.remove("hidden");
 
-            // ✅ contador en tiempo real
             if (lockTimer) clearInterval(lockTimer);
             lockTimer = setInterval(() => {
                 lockCountdown.textContent = getCountdownText();
-
-                // ✅ si ya llegó la fecha, cierra solo el modal
-                if (canOpenLetter()) {
-                    hideLockModal();
-                }
+                if (canOpenLetter()) hideLockModal();
             }, 1000);
         }
+
 
         function hideLockModal() {
             lockModal.classList.add("hidden");
@@ -1029,10 +1158,10 @@ body {
         const music = document.getElementById("bgMusic");
 
         // 👇 CAMBIA ESTOS VALORES (en segundos)
-        const loopStart = 52.5; // ejemplo: 1:12
-        const loopEnd = 93.8;   // ejemplo: 1:38
+        const loopStart = 46.5; // ejemplo: 1:12
+        const loopEnd = 79;   // ejemplo: 1:38
 
-        music.volume = 0.5;
+        music.volume = 1;
 
         // Repite solo el tramo
         music.addEventListener("timeupdate", () => {
